@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -25,6 +25,8 @@ import {
 
 export default function App() {
   const API_APPOINTMENTS_URL = '/api/appointments';
+  const APPOINTMENTS_STORAGE_KEY = 'katre_clinic_appointments';
+  const APPOINTMENTS_SYNC_INTERVAL_MS = 3000;
   const normalizeAppointments = (items: Appointment[]): Appointment[] =>
     items.map(appointment => ({
       ...appointment,
@@ -33,6 +35,7 @@ export default function App() {
           ? appointment.status
           : 'PENDING'
     }));
+  const serializeAppointments = (items: Appointment[]) => JSON.stringify(normalizeAppointments(items));
 
   // Appointments Database state with API + localStorage fallback
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -49,47 +52,87 @@ export default function App() {
   // Back to top floating switch
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // Load Initial Database from API first, then fallback to localStorage or static mock
-  useEffect(() => {
-    const loadAppointments = async () => {
-      try {
-        const response = await fetch(API_APPOINTMENTS_URL);
-        if (!response.ok) {
-          throw new Error('API not available');
-        }
+  const applyAppointments = useCallback((items: Appointment[]) => {
+    const normalizedAppointments = normalizeAppointments(items);
+    const serializedAppointments = serializeAppointments(normalizedAppointments);
 
-        const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          const normalizedData = normalizeAppointments(data);
-          setAppointments(normalizedData);
-          localStorage.setItem('katre_clinic_appointments', JSON.stringify(normalizedData));
-          return;
-        }
+    setAppointments(currentAppointments =>
+      serializeAppointments(currentAppointments) === serializedAppointments
+        ? currentAppointments
+        : normalizedAppointments
+    );
+    localStorage.setItem(APPOINTMENTS_STORAGE_KEY, serializedAppointments);
+    return normalizedAppointments;
+  }, []);
+
+  const loadAppointmentsFromApi = useCallback(async () => {
+    const response = await fetch(API_APPOINTMENTS_URL);
+    if (!response.ok) {
+      throw new Error('API not available');
+    }
+
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid appointments payload');
+    }
+
+    return applyAppointments(data);
+  }, [applyAppointments]);
+
+  // Load initial database from API first, then keep admin screens synced with API polling and localStorage fallback.
+  useEffect(() => {
+    const loadInitialAppointments = async () => {
+      try {
+        await loadAppointmentsFromApi();
+        return;
       } catch (error) {
-        const saved = localStorage.getItem('katre_clinic_appointments');
+        const saved = localStorage.getItem(APPOINTMENTS_STORAGE_KEY);
         if (saved) {
           try {
-            setAppointments(normalizeAppointments(JSON.parse(saved)));
+            applyAppointments(JSON.parse(saved));
+            return;
           } catch {
-            setAppointments(normalizeAppointments(INITIAL_APPOINTMENTS));
+            // Fall through to static demo data.
           }
-        } else {
-          const normalizedInitialAppointments = normalizeAppointments(INITIAL_APPOINTMENTS);
-          setAppointments(normalizedInitialAppointments);
-          localStorage.setItem('katre_clinic_appointments', JSON.stringify(normalizedInitialAppointments));
         }
+
+        applyAppointments(INITIAL_APPOINTMENTS);
       }
     };
 
-    loadAppointments();
+    const syncFromStorage = (event: StorageEvent) => {
+      if (event.key !== APPOINTMENTS_STORAGE_KEY || !event.newValue) return;
+
+      try {
+        const data = JSON.parse(event.newValue);
+        if (Array.isArray(data)) {
+          applyAppointments(data);
+        }
+      } catch {
+        // Ignore malformed external storage writes.
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      void loadAppointmentsFromApi().catch(() => {
+        // API can be unavailable in demo mode; localStorage remains the fallback.
+      });
+    }, APPOINTMENTS_SYNC_INTERVAL_MS);
+
+    loadInitialAppointments();
 
     // Scroll top monitor
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
     };
+    window.addEventListener('storage', syncFromStorage);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('storage', syncFromStorage);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [applyAppointments, loadAppointmentsFromApi]);
 
   useEffect(() => {
     const syncAdminRoute = () => {
@@ -114,18 +157,23 @@ export default function App() {
 
   // Save changes to API and keep browser fallback in sync
   const persistAppointments = async (newAppointments: Appointment[]) => {
-    const normalizedAppointments = normalizeAppointments(newAppointments);
-    setAppointments(normalizedAppointments);
-    localStorage.setItem('katre_clinic_appointments', JSON.stringify(normalizedAppointments));
+    const normalizedAppointments = applyAppointments(newAppointments);
 
     try {
-      await fetch(API_APPOINTMENTS_URL, {
+      const response = await fetch(API_APPOINTMENTS_URL, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(normalizedAppointments)
       });
+
+      if (response.ok) {
+        const savedAppointments = await response.json();
+        if (Array.isArray(savedAppointments)) {
+          applyAppointments(savedAppointments);
+        }
+      }
     } catch (error) {
       // Fallback is already stored locally; API can be unavailable in demo environments.
     }
@@ -384,4 +432,5 @@ export default function App() {
     </div>
   );
 }
+
 
