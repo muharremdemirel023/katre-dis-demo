@@ -1,0 +1,6 @@
+{
+  "name": "Katre Diş Polikliniği",
+  "description": "Katre Ağız ve Diş Sağlığı Polikliniği modern web sitesi ve online randevu yönetim yazılımı.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
