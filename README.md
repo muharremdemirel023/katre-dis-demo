@@ -1,23 +1,67 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Katre Diş Demo Projesi
 
-# Run and deploy your AI Studio app
+Katre Diş Polikliniği için hazırlanmış modern web sitesi ve online randevu yönetim demosudur. Proje; hasta tarafında randevu talebi oluşturma, klinik tarafında randevuları görüntüleme ve durum yönetimi akışlarını içerir.
 
-This contains everything you need to run your app locally.
+## Özellikler
 
-View your app in AI Studio: https://ai.studio/apps/dcd2bfbc-7972-4059-9468-3ef3261941fb
+- Modern klinik tanıtım sayfası
+- Online randevu formu
+- Randevu sonrası profesyonel başarı ekranı
+- Admin panelde randevu listesi
+- Randevu durumları: Bekliyor, Onaylandı, İptal Edildi
+- Dosya tabanlı basit API ve tarayıcı yedeği
+- Mobil uyumlu arayüz
 
-## Run Locally
+## Kurulum
 
-**Prerequisites:** Node.js
+**Gereksinim:** Node.js
 
-1. Install dependencies:
-   `npm install`
-2. Start the API backend:
-   `npm run server`
-3. Start the frontend in another terminal:
-   `npm run dev`
-4. Open the app at `http://localhost:3000`
+```bash
+npm install
+```
 
-The frontend proxies API requests from `/api/*` to the backend running on port `3002`.
+## Geliştirme Ortamı
+
+API sunucusunu başlatın:
+
+```bash
+npm run server
+```
+
+Ayrı bir terminalde arayüzü başlatın:
+
+```bash
+npm run dev
+```
+
+Uygulama varsayılan olarak şu adreste açılır:
+
+```text
+http://localhost:3000
+```
+
+## Admin Panel
+
+Admin panel adresi:
+
+```text
+http://localhost:3000/admin
+```
+
+Demo PIN:
+
+```text
+1234
+```
+
+## Build
+
+Production çıktısı almak için:
+
+```bash
+npm run build
+```
+
+## Veri Saklama
+
+Randevu kayıtları API çalışırken `data/appointments.json` dosyasında tutulur. API erişilemezse tarayıcı tarafında `localStorage` yedeği kullanılır.
