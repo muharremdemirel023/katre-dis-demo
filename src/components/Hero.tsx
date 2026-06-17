@@ -44,10 +44,10 @@ export default function Hero({ onOpenBooking, onNavigate }: HeroProps) {
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <button
                 onClick={onOpenBooking}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-blue-200/80 transition duration-300 transform hover:-translate-y-1 cursor-pointer"
+                className="premium-cta-shine w-full sm:w-auto flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold px-8 py-4 rounded-xl shadow-xl shadow-blue-200/80 cursor-pointer"
               >
-                <Calendar className="w-5 h-5" />
-                <span>Hemen Randevu Al</span>
+                <Calendar className="relative z-10 w-5 h-5" />
+                <span className="relative z-10">Hemen Randevu Al</span>
               </button>
 
               <a

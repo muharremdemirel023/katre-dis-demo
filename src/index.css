@@ -1,1 +1,59 @@
 @import "tailwindcss";
+
+@keyframes premium-cta-shine {
+  0%,
+  62% {
+    transform: translateX(-145%) skewX(-18deg);
+    opacity: 0;
+  }
+  72% {
+    opacity: 0.42;
+  }
+  88% {
+    opacity: 0.18;
+  }
+  100% {
+    transform: translateX(145%) skewX(-18deg);
+    opacity: 0;
+  }
+}
+
+.premium-cta-shine {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition-property: transform, box-shadow, background-color, border-color, color;
+  transition-duration: 220ms;
+  transition-timing-function: ease;
+}
+
+.premium-cta-shine::after {
+  content: "";
+  position: absolute;
+  inset: -35% auto -35% -55%;
+  width: 42%;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.62),
+    rgba(255, 255, 255, 0.12),
+    transparent
+  );
+  filter: blur(0.5px);
+  animation: premium-cta-shine 3.8s ease-in-out infinite;
+}
+
+.premium-cta-shine:hover {
+  transform: translateY(-1px) scale(1.025);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .premium-cta-shine,
+  .premium-cta-shine::after {
+    animation: none;
+    transition: none;
+  }
+}

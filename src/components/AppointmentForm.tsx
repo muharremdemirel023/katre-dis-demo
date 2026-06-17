@@ -89,10 +89,15 @@ export default function AppointmentForm({
 
   if (!isOpen) return null;
 
-  // Conflict Resolution: Find out which times are already taken for the chosen doctor at the chosen date
+  // Conflict Resolution: pending and approved appointments block a slot; cancelled slots are free again.
+  const isBlockingAppointment = (appointment: Appointment) =>
+    appointment.status === 'PENDING' || appointment.status === 'APPROVED';
+
   const bookedTimes = existingAppointments
-    .filter(apt => apt.doctorId === doctorId && apt.date === date && apt.status !== 'CANCELLED')
+    .filter(apt => apt.doctorId === doctorId && apt.date === date && isBlockingAppointment(apt))
     .map(apt => apt.time);
+  const bookedTimeSet = new Set(bookedTimes);
+  const allSlotsBooked = WORK_HOURS.length > 0 && WORK_HOURS.every(hr => bookedTimeSet.has(hr));
 
   // Form Validation
   const validate = () => {
@@ -110,6 +115,9 @@ export default function AppointmentForm({
     }
     if (!date) tempErrors.date = 'Lütfen randevu tarihi seçin.';
     if (!selectedTime) tempErrors.selectedTime = 'Lütfen randevu saati seçin.';
+    if (selectedTime && bookedTimeSet.has(selectedTime)) {
+      tempErrors.selectedTime = 'Seçtiğiniz saat dolu. Lütfen boş bir saat seçin.';
+    }
 
     setErrors(tempErrors);
     return Object.keys(tempErrors).length === 0;
@@ -130,9 +138,24 @@ export default function AppointmentForm({
       return;
     }
 
+    const slotTaken = existingAppointments.some(
+      apt =>
+        isBlockingAppointment(apt) &&
+        apt.doctorId === doctorId &&
+        apt.date === date &&
+        apt.time === selectedTime
+    );
+
+    if (slotTaken) {
+      setErrors({
+        selectedTime: 'Bu saat dolu. Lütfen boş bir saat seçin.'
+      });
+      return;
+    }
+
     const duplicateExists = existingAppointments.some(
       apt =>
-        apt.status !== 'CANCELLED' &&
+        isBlockingAppointment(apt) &&
         apt.doctorId === doctorId &&
         apt.date === date &&
         apt.time === selectedTime &&
@@ -486,15 +509,16 @@ export default function AppointmentForm({
                   
                   <div className="grid grid-cols-4 sm:grid-cols-5 gap-2.5">
                     {WORK_HOURS.map((hr) => {
-                      const idTaken = bookedTimes.includes(hr);
+                      const isTaken = bookedTimeSet.has(hr);
                       const isSelected = selectedTime === hr;
 
                       return (
                         <button
                           key={hr}
                           type="button"
-                          disabled={idTaken}
+                          disabled={isTaken}
                           onClick={() => {
+                            if (isTaken) return;
                             setSelectedTime(hr);
                             if (errors.selectedTime) {
                               const updated = { ...errors };
@@ -503,21 +527,26 @@ export default function AppointmentForm({
                             }
                           }}
                           className={`py-2 px-1 text-xs font-extrabold rounded-lg border text-center transition-all cursor-pointer ${
-                            idTaken
-                              ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed line-through relative'
+                            isTaken
+                              ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-80 relative'
                               : isSelected
                               ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-100'
                               : 'bg-white border-slate-200 hover:border-blue-400 text-slate-700 hover:bg-blue-50/50'
                           }`}
                         >
                           {hr}
-                          {idTaken && (
+                          {isTaken && (
                             <span className="block text-[8px] opacity-70 font-medium -mt-0.5">Dolu</span>
                           )}
                         </button>
                       );
                     })}
                   </div>
+                  {allSlotsBooked && (
+                    <div className="rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-[11px] font-bold text-amber-700">
+                      Bu gün için tüm saatler dolu.
+                    </div>
+                  )}
                   {errors.selectedTime && (
                     <p className="text-[10px] text-red-500 font-bold flex items-center gap-1 mt-1">
                       <AlertCircle className="w-3 h-3" /> {errors.selectedTime}
@@ -569,3 +598,4 @@ export default function AppointmentForm({
     </div>
   );
 }
+

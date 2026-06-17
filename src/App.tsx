@@ -104,9 +104,7 @@ export default function App() {
     return list.some(apt =>
       apt.id === candidate.id ||
       (
-        apt.name === candidate.name &&
-        apt.phone === candidate.phone &&
-        apt.email === candidate.email &&
+        apt.status !== 'CANCELLED' &&
         apt.date === candidate.date &&
         apt.time === candidate.time &&
         apt.doctorId === candidate.doctorId
@@ -386,3 +384,4 @@ export default function App() {
     </div>
   );
 }
+

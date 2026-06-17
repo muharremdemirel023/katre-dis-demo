@@ -63,10 +63,10 @@ export default function Navbar({ onNavigate, onOpenBooking }: NavbarProps) {
 
             <button
               onClick={onOpenBooking}
-              className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow-lg shadow-blue-200 transition transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
+              className="premium-cta-shine flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow-lg shadow-blue-200 active:translate-y-0 cursor-pointer"
             >
-              <Calendar className="w-4.5 h-4.5" />
-              <span>Hemen Randevu Al</span>
+              <Calendar className="relative z-10 w-4.5 h-4.5" />
+              <span className="relative z-10">Hemen Randevu Al</span>
             </button>
 
           </div>

@@ -187,10 +187,10 @@ export default function Contact({ onOpenBooking }: ContactProps) {
 
               <button
                 onClick={onOpenBooking}
-                className="bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs px-5 py-3 rounded-xl flex items-center space-x-2 shrink-0 transition cursor-pointer"
+                className="premium-cta-shine bg-white text-blue-700 hover:bg-blue-50 font-bold text-xs px-5 py-3 rounded-xl flex items-center space-x-2 shrink-0 cursor-pointer"
               >
-                <CalendarDays className="w-4 h-4" />
-                <span>Hemen Randevu Al</span>
+                <CalendarDays className="relative z-10 w-4 h-4" />
+                <span className="relative z-10">Hemen Randevu Al</span>
               </button>
             </div>
           </div>
