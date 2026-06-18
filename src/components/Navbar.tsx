@@ -30,10 +30,10 @@ export default function Navbar({ onNavigate, onOpenBooking }: NavbarProps) {
             onClick={() => handleNavigate('hero')}
           >
             <img
-              src="/katre-logo.png"
-              alt="Katre Diş Logo"
-              className="h-12 sm:h-14 w-auto object-contain"
-            />
+  src="/katre-logo.png"
+  alt="Katre Diş Logo"
+  className="h-16 sm:h-20 w-auto object-contain"
+/>
           </div>
 
           <nav className="hidden lg:flex items-center space-x-8 text-[15px] font-medium text-slate-600">
