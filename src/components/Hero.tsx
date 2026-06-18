@@ -26,7 +26,7 @@ export default function Hero({ onOpenBooking, onNavigate }: HeroProps) {
           <div className="space-y-8 text-center lg:text-left">
             <div className="inline-flex items-center space-x-2 bg-blue-50 border border-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Sancaktepe\'nin En Güvenilir Polikliniği</span>
+              <span>Sancaktepe'nin En Güvenilir Polikliniği</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight">
@@ -37,7 +37,7 @@ export default function Hero({ onOpenBooking, onNavigate }: HeroProps) {
             </h1>
 
             <p className="text-slate-600 text-lg sm:text-xl max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
-              Katre Ağız ve Diş Sağlığı Polikliniği\'nde, en modern teknolojiler ve uzman hekim kadromuz ile acısız, steril ve premium tedavi deneyimi sunuyoruz.
+              Katre Ağız ve Diş Sağlığı Polikliniği'nde, en modern teknolojiler ve uzman hekim kadromuz ile acısız, steril ve premium tedavi deneyimi sunuyoruz.
             </p>
 
             {/* CTA Buttons */}
