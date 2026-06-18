@@ -24,21 +24,16 @@ export default function Navbar({ onNavigate, onOpenBooking }: NavbarProps) {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-blue-50/80 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => handleNavigate('hero')}>
-            <div className="w-11 h-11 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-200/50">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-6 h-6">
-                <path d="M12 2C11.5 2 7 5 7 10C7 16 12 22 12 22C12 22 17 16 17 10C17 5 12.5 2 12 2Z" />
-                <path d="M12 6C10.5 6 9.5 7 9.5 8.5C9.5 10 12 11.5 12 13" />
-              </svg>
-            </div>
-            <div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent tracking-tight">
-                KATRE
-              </span>
-              <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold -mt-1">
-                Ağız ve Diş Sağlığı
-              </div>
-            </div>
+          
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => handleNavigate('hero')}
+          >
+            <img
+              src="/katre-logo.png"
+              alt="Katre Diş Logo"
+              className="h-12 sm:h-14 w-auto object-contain"
+            />
           </div>
 
           <nav className="hidden lg:flex items-center space-x-8 text-[15px] font-medium text-slate-600">
@@ -132,4 +127,4 @@ export default function Navbar({ onNavigate, onOpenBooking }: NavbarProps) {
       </div>
     </header>
   );
-}
+            }
