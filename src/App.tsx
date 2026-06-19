@@ -235,7 +235,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-800 font-sans antialiased flex flex-col justify-between">
+    <div className="min-h-screen max-w-full overflow-x-hidden bg-white text-slate-800 font-sans antialiased flex flex-col justify-between">
       
       {/* Top Navigation Hub */}
       <Navbar
@@ -273,7 +273,7 @@ export default function App() {
           </div>
         ) : (
           // Primary Clinical Website Content
-          <div className="animate-fadeIn">
+          <div className="animate-fadeIn max-w-full overflow-x-hidden">
             {/* 1. Hero Block */}
             <Hero
               onOpenBooking={() => setIsBookingOpen(true)}
@@ -299,7 +299,7 @@ export default function App() {
       </main>
 
       {/* Gorgeous Premium Footer */}
-      <footer className="bg-slate-900 text-white pt-16 pb-8 border-t border-slate-800">
+      <footer className="max-w-full overflow-x-hidden bg-slate-900 text-white pt-16 pb-8 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 pb-12 border-b border-slate-800">
@@ -391,7 +391,7 @@ export default function App() {
           {/* Legal / Copyright strip */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-slate-500 text-center">
             <p>© 2026 Katre Ağız ve Diş Sağlığı Polikliniği. Tüm Hakları Saklıdır.</p>
-            <div className="flex space-x-4">
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
               <a href="#" className="hover:text-slate-400 transition">Aydınlatma Metni (KVKK)</a>
               <span>•</span>
               <a href="#" className="hover:text-slate-400 transition">Çerez Politikası</a>
