@@ -66,6 +66,8 @@ npm run build
 
 Randevu kayıtları API çalışırken `data/appointments.json` dosyasında tutulur. API erişilemezse tarayıcı tarafında `localStorage` yedeği kullanılır.
 
+Vercel statik demo modunda randevular `localStorage`da tutulur. Gerçek çok cihazlı kullanım için backend/veritabanı gerekir.
+
 ## WhatsApp / n8n Demo Entegrasyonu
 
 Bos saat sorgusu ornegi:

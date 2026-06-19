@@ -48,6 +48,7 @@ export default function App() {
   // Display Mode: admin console is only available from /admin.
   const [isAdminModeActive, setIsAdminModeActive] = useState(() => window.location.pathname.replace(/\/$/, '') === '/admin');
   const [bookingSuccess, setBookingSuccess] = useState<Appointment | null>(null);
+  const [apiAvailable, setApiAvailable] = useState(true);
 
   // Back to top floating switch
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -65,6 +66,22 @@ export default function App() {
     return normalizedAppointments;
   }, []);
 
+  const loadAppointmentsFromStorage = useCallback(() => {
+    const saved = localStorage.getItem(APPOINTMENTS_STORAGE_KEY);
+    if (!saved) return null;
+
+    try {
+      const data = JSON.parse(saved);
+      if (Array.isArray(data)) {
+        return applyAppointments(data);
+      }
+    } catch {
+      // Ignore malformed demo storage and fall back to static data.
+    }
+
+    return null;
+  }, [applyAppointments]);
+
   const loadAppointmentsFromApi = useCallback(async () => {
     const response = await fetch(API_APPOINTMENTS_URL);
     if (!response.ok) {
@@ -76,24 +93,21 @@ export default function App() {
       throw new Error('Invalid appointments payload');
     }
 
+    setApiAvailable(true);
     return applyAppointments(data);
   }, [applyAppointments]);
 
-  // Load initial database from API first, then keep admin screens synced with API polling and localStorage fallback.
+  // Load initial database from API first; static demo deployments continue from localStorage if API is absent.
   useEffect(() => {
     const loadInitialAppointments = async () => {
       try {
         await loadAppointmentsFromApi();
         return;
       } catch (error) {
-        const saved = localStorage.getItem(APPOINTMENTS_STORAGE_KEY);
-        if (saved) {
-          try {
-            applyAppointments(JSON.parse(saved));
-            return;
-          } catch {
-            // Fall through to static demo data.
-          }
+        setApiAvailable(false);
+
+        if (loadAppointmentsFromStorage()) {
+          return;
         }
 
         applyAppointments(INITIAL_APPOINTMENTS);
@@ -113,12 +127,6 @@ export default function App() {
       }
     };
 
-    const intervalId = window.setInterval(() => {
-      void loadAppointmentsFromApi().catch(() => {
-        // API can be unavailable in demo mode; localStorage remains the fallback.
-      });
-    }, APPOINTMENTS_SYNC_INTERVAL_MS);
-
     loadInitialAppointments();
 
     // Scroll top monitor
@@ -128,11 +136,23 @@ export default function App() {
     window.addEventListener('storage', syncFromStorage);
     window.addEventListener('scroll', handleScroll);
     return () => {
-      window.clearInterval(intervalId);
       window.removeEventListener('storage', syncFromStorage);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [applyAppointments, loadAppointmentsFromApi]);
+  }, [applyAppointments, loadAppointmentsFromApi, loadAppointmentsFromStorage]);
+
+  useEffect(() => {
+    if (!apiAvailable) return;
+
+    const intervalId = window.setInterval(() => {
+      void loadAppointmentsFromApi().catch(() => {
+        setApiAvailable(false);
+        loadAppointmentsFromStorage();
+      });
+    }, APPOINTMENTS_SYNC_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [apiAvailable, loadAppointmentsFromApi, loadAppointmentsFromStorage]);
 
   useEffect(() => {
     const syncAdminRoute = () => {
@@ -155,9 +175,13 @@ export default function App() {
     );
   };
 
-  // Save changes to API and keep browser fallback in sync
+  // Save changes locally first; sync to API only when it is available.
   const persistAppointments = async (newAppointments: Appointment[]) => {
     const normalizedAppointments = applyAppointments(newAppointments);
+
+    if (!apiAvailable) {
+      return;
+    }
 
     try {
       const response = await fetch(API_APPOINTMENTS_URL, {
@@ -168,13 +192,17 @@ export default function App() {
         body: JSON.stringify(normalizedAppointments)
       });
 
-      if (response.ok) {
-        const savedAppointments = await response.json();
-        if (Array.isArray(savedAppointments)) {
-          applyAppointments(savedAppointments);
-        }
+      if (!response.ok) {
+        setApiAvailable(false);
+        return;
+      }
+
+      const savedAppointments = await response.json();
+      if (Array.isArray(savedAppointments)) {
+        applyAppointments(savedAppointments);
       }
     } catch (error) {
+      setApiAvailable(false);
       // Fallback is already stored locally; API can be unavailable in demo environments.
     }
   };
