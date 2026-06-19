@@ -65,3 +65,40 @@ npm run build
 ## Veri Saklama
 
 Randevu kayıtları API çalışırken `data/appointments.json` dosyasında tutulur. API erişilemezse tarayıcı tarafında `localStorage` yedeği kullanılır.
+
+## WhatsApp / n8n Demo Entegrasyonu
+
+Bos saat sorgusu ornegi:
+
+```http
+GET /api/whatsapp/available-slots?doctor=Dt.%20Ugur%20Kaya&date=2026-06-20
+x-bot-secret: demo-secret-123
+```
+
+Randevu olusturma ornegi:
+
+```http
+POST /api/whatsapp/appointments
+Content-Type: application/json
+x-bot-secret: demo-secret-123
+```
+
+Ornek JSON body:
+
+```json
+{
+  "name": "Ali Demir",
+  "phone": "905551112233",
+  "service": "Dolgu",
+  "doctor": "Dt. Ugur Kaya",
+  "date": "2026-06-20",
+  "time": "14:30",
+  "note": "WhatsApp bot uzerinden olusturuldu"
+}
+```
+
+n8n akisi:
+
+```text
+Evolution API Webhook -> HTTP Request -> /api/whatsapp/available-slots veya /api/whatsapp/appointments -> WhatsApp cevap
+```
